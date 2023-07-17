@@ -1,12 +1,14 @@
 const mysql2 = require('mysql2');
+require('dotenv').config()
 
-const pool = mysql2.createPool({
+const conn = mysql2.createConnection({
     connectionLimit: 10,
-    host: 'localhost',
-    user: 'root',
-    password: '1407',
-    database: 'nodemysql', 
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE, 
 });
 
-module.exports = pool
+module.exports = conn
+
 

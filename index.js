@@ -1,7 +1,8 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
-const pool = require('./db/conn');
+const conn = require('./db/conn');
 const port = 3000
+
 
 const app = express();
 
@@ -27,7 +28,7 @@ app.post('/books/insertbooks', (req, res) => {
     const query = `INSERT INTO books (??, ??) VALUES(? , ?)`
     const data = ['title', 'pageqty', title_name, pages_qyt]
     
-    pool.query(query, data, (err) => {
+    conn.query(query, data, (err) => {
         if (err) {
             console.log(err);
         }
@@ -40,7 +41,7 @@ app.get('/books', (req, res) => {
     
     const sql = `SELECT * FROM books`
 
-    pool.query(sql, (err, data) => {
+    conn.query(sql, (err, data) => {
         
         if (err) {
             console.log(err);
@@ -61,7 +62,7 @@ app.get('/books/:id', (req, res) => {
     const sql = `SELECT * FROM books WHERE ?? = ?`
     const data = ['id', id]
     
-    pool.query(sql, data, (err, data) => {
+    conn.query(sql, data, (err, data) => {
         if (err) {
             console.log(err);
         }
@@ -80,7 +81,7 @@ app.get('/books/edit/:id', (req, res) => {
     const sql = `SELECT * FROM books WHERE ?? = ?`
     const data = ['id', id]
 
-    pool.query(sql, data, (err, data) => {
+    conn.query(sql, data, (err, data) => {
         if (err) {
             console.log(err);
         }
@@ -106,7 +107,7 @@ app.post('/books/updatebooks', (req, res) => {
 
     const data = ['pageqty', qty, 'title', title, 'id', id];
 
-    pool.query(sql, data, (err) => {
+    conn.query(sql, data, (err) => {
         if (err) {
             console.log(err);
         }
@@ -122,7 +123,7 @@ app.post('/books/:id/remove', (req, res) => {
     const sql = `DELETE FROM books WHERE ?? = ?`
     const data = ['id', id]
 
-    pool.query(sql, data, (err) => {
+    conn.query(sql, data, (err) => {
         if (err) {
             console.log(err);
         }
