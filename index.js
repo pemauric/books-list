@@ -133,11 +133,17 @@ app.post('/books/:id/remove', (req, res) => {
 })
 
 
+conn.connect((err) => {
+    if (err) {
+        console.log(err);
+    }
+    console.log('MySQL connection established')
+    app.listen(port, () => {
+        console.log(`Server running on port ${port}`);
+    });
+})
 
 
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
 
 
 
