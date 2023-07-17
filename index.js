@@ -1,9 +1,7 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
-const mysql2 = require('mysql2');
-const port = process.env.PORT || 3000
-
-require('dotenv').config()
+const pool = require('./db/conn');
+const port = 3000
 
 const app = express();
 
@@ -26,9 +24,10 @@ app.post('/books/insertbooks', (req, res) => {
     const title_name = req.body.title_name
     const pages_qyt = req.body.pagesqty
 
-    const query = `INSERT INTO books (title, pageqty) VALUES('${title_name}' , '${pages_qyt}')`
+    const query = `INSERT INTO books (??, ??) VALUES(? , ?)`
+    const data = ['title', 'pageqty', title_name, pages_qyt]
     
-    conn.query(query, (err) => {
+    pool.query(query, data, (err) => {
         if (err) {
             console.log(err);
         }
@@ -41,7 +40,7 @@ app.get('/books', (req, res) => {
     
     const sql = `SELECT * FROM books`
 
-    conn.query(sql, (err, data) => {
+    pool.query(sql, (err, data) => {
         
         if (err) {
             console.log(err);
@@ -59,9 +58,10 @@ app.get('/books', (req, res) => {
 app.get('/books/:id', (req, res) => {
     const id = req.params.id
 
-    const sql = `SELECT * FROM books WHERE id = ${id}`
-
-    conn.query(sql, (err, data) => {
+    const sql = `SELECT * FROM books WHERE ?? = ?`
+    const data = ['id', id]
+    
+    pool.query(sql, data, (err, data) => {
         if (err) {
             console.log(err);
         }
@@ -77,9 +77,10 @@ app.get('/books/:id', (req, res) => {
 app.get('/books/edit/:id', (req, res) => {
     const id = req.params.id
 
-    const sql = `SELECT * FROM books WHERE id = ${id}`
+    const sql = `SELECT * FROM books WHERE ?? = ?`
+    const data = ['id', id]
 
-    conn.query(sql, (err, data) => {
+    pool.query(sql, data, (err, data) => {
         if (err) {
             console.log(err);
         }
@@ -99,9 +100,13 @@ app.post('/books/updatebooks', (req, res) => {
     const qty = req.body.pagesqty
     const title = req.body.title_name
     
-    const sql = `UPDATE books SET pageqty = '${qty}', title = '${title}' WHERE id = ${id}`
+    //const sql = `UPDATE books SET pageqty = '${qty}', title = '${title}' WHERE id = ${id}`
+    
+    const sql = `UPDATE books SET ?? = ?, ?? = ? WHERE ?? = ?`
 
-    conn.query(sql, (err) => {
+    const data = ['pageqty', qty, 'title', title, 'id', id];
+
+    pool.query(sql, data, (err) => {
         if (err) {
             console.log(err);
         }
@@ -114,9 +119,10 @@ app.post('/books/:id/remove', (req, res) => {
     
     const id = req.params.id
     
-    const sql = `DELETE FROM books WHERE id = ${id}`
+    const sql = `DELETE FROM books WHERE ?? = ?`
+    const data = ['id', id]
 
-    conn.query(sql, (err) => {
+    pool.query(sql, data, (err) => {
         if (err) {
             console.log(err);
         }
@@ -125,23 +131,11 @@ app.post('/books/:id/remove', (req, res) => {
     res.redirect('/books')
 })
 
-const conn = mysql2.createConnection({
-    host: process.env.MYSQL_HOST,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
-    insecureAuth: true,
-});
 
-conn.connect((err) => {
-    if (err) {
-        console.log(err);
-    }else {
-        console.log('Connection established');
-        app.listen(port, () => {
-            console.log(`Server running on port ${port}`);
-        });
-    }
+
+
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
 });
 
 
